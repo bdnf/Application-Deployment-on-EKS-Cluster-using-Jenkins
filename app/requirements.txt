@@ -1,0 +1,10 @@
+pandas
+numpy
+nltk
+beautifulsoup4
+html5lib
+pylint
+torch
+torchvision
+flask
+scikit-learn==0.20.2

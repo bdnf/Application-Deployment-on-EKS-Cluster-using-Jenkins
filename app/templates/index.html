@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Sentiment Analysis Web App</title>
+        <meta charset="utf-8">
+        <meta name="viewport"  content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <script>
+         "use strict";
+         function submitForm(oFormElement) {
+             var xhr = new XMLHttpRequest();
+             xhr.onload = function() {
+                 var result = parseFloat(xhr.responseText);
+                 var resultElement = document.getElementById('result');
+                 if (result < 0.4) {
+                     resultElement.className = 'bg-danger';
+                     resultElement.innerHTML = 'Your review was NEGATIVE!    (Scored only: ' + (result.toFixed(3)*100) + ' %)';
+                 } else if (result >= 0.4 & result < 0.6){
+                     resultElement.className = 'bg-primary';
+                     resultElement.innerHTML = 'Your review was NEUTRAL!     (Scored: ' + (result.toFixed(3)*100) + ' %)';
+                 }
+                 else {
+                     resultElement.className = 'bg-success';
+                     resultElement.innerHTML = 'Your review was POSITIVE!     (With probability: ' + (result.toFixed(3)*100) + ' %)';
+                 }
+             }
+             xhr.open (oFormElement.method, oFormElement.action, true);
+             var review = document.getElementById('review');
+             xhr.send (review.value);
+             return false;
+         }
+        </script>
+
+    </head>
+    <body>
+
+        <div class="container">
+            <h1>Is your review positive, or negative?</h1>
+            <p>Enter your review below and click submit to find out...</p>
+            <form method="POST"
+                  action="/predict"
+                  onsubmit="return submitForm(this);" name="reviewForm">                     <!-- HERE IS WHERE YOU NEED TO ENTER THE API URL -->
+                <div class="form-group">
+                    <label for="review">Review:</label>
+                    <textarea class="form-control"  rows="5" id="review" name="review">Please write your review here.</textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            <h1 class="bg-success" id="result"></h1>
+        </div>
+    </body>
+</html>

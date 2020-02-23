@@ -1,0 +1,34 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eks-simple-cluster
+  region: us-east-1
+#
+#
+# vpc:
+#   id: "vpc-00e4b6f2f0386646d"  # (optional, must match VPC ID used for each subnet below)
+#   cidr: "192.168.0.0/16"       # (optional, must match CIDR used by the given VPC)
+#   subnets:
+#     # must provide 'private' and/or 'public' subnets by availibility zone as shown
+#     private:
+#       us-east-1a:
+#         id: "subnet-0bb3626b69314655a"
+#         cidr: "192.168.64.0/18"   # (optional, must match CIDR used by the given subnet)
+#
+#       us-east-1b:
+#         id: "subnet-0346107f3ec6e7591"
+#         cidr: "192.168.128.0/18" # (optional, must match CIDR used by the given subnet)
+#
+#       us-east-1c:
+#         id: "subnet-064766f3a11487c91"
+#         cidr: "192.168.192.0/18"  # (optional, must match CIDR used by the given subnet)
+
+
+nodeGroups:
+  - name: ng-1
+    instanceType: t2.small
+    desiredCapacity: 3
+    privateNetworking: true # if only 'Private' subnets are given, this must be enabled
+    ssh: # use existing EC2 key
+      publicKeyName: jenkins-server-access
