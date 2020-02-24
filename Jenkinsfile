@@ -28,7 +28,8 @@ pipeline {
       }
       stage('Push image') {
         steps{
-          withCredentials([$class: 'UsernamePasswordMultiBinding', string(credentialsId: 'dockerhub'), usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']) {
+          withCredentials([[$class: 'UsernamePasswordMultiBinding', string(credentialsId: 'dockerhub'),
+                usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                  sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}'
