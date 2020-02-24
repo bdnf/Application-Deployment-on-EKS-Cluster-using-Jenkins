@@ -22,13 +22,7 @@ pipeline {
           sh './scripts/test.sh pytorch-app'
         }
       }
-      stage('Deploy') {
-          agent {
-            dockerfile {
-                filename 'Dockerfile'
-                dir 'app'
-            }
-          }
+      stage('Push image to DockerHub') {
           steps {
                 echo 'Starting to build docker image'
                 script {
