@@ -2,6 +2,10 @@ pipeline {
 
   agent any
   stages {
+      stage('Initialize'){
+           def dockerHome = tool 'myDocker'
+           env.PATH = "${dockerHome}/bin:${env.PATH}"
+       }
       stage('Lint HTML') {
         steps {
           sh 'pwd && ls && tidy -q -e */*/*.html'
