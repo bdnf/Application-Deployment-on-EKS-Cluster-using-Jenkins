@@ -24,12 +24,7 @@ pipeline {
           sh './scripts/test.sh $IMAGE_NAME'
         }
       }
-      stage('Scan Dockerfile for vulnerabilities') {
-            steps{
-                aquaMicroscanner imageName: IMAGE_NAME, notCompliesCmd: 'exit 1', onDisallowed: 'fail'
-            }
-        }
-      stage('Deploying now') {
+      stage('Deploy') {
           agent {
             dockerfile {
                 filename 'Dockerfile'
@@ -39,7 +34,7 @@ pipeline {
           steps {
                 echo 'Starting to build docker image'
                 script {
-                      def customImage = docker.build("pytorch-app:${env.BUILD_ID}")
+                      def customImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
                       customImage.push()
                 }
 
