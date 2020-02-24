@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: model-ml
+  name: model-ml
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-ml
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: model-ml
+    spec:
+      containers:
+        image: olehbodunov/ml-model-predictor
+        imagePullPolicy: Always
+        name: model-ml
+        ports:
+        - containerPort: 80
+      restartPolicy: Always

@@ -4,7 +4,9 @@ pipeline {
     registryCredential = 'dockerhub'
     dockerImage = ''
   }
-  agent any
+  agent {
+    label 'docker' 
+  }
   stages {
       stage('Lint HTML') {
         steps {
@@ -26,7 +28,7 @@ pipeline {
           sh './scripts/test.sh pytorch-app'
         }
       }
-      stage('Push image') {
+      stage('Rebuild and tag image') {
           agent {
             dockerfile {
                 filename 'Dockerfile'
@@ -41,7 +43,7 @@ pipeline {
 
          }
       }
-      stage('Deploy Image') {
+      stage('Push image') {
         steps{
           script {
             docker.withRegistry( '', registryCredential ) {
@@ -50,5 +52,18 @@ pipeline {
           }
         }
       }
+      stage('Deploy application') {
+        steps {
+          sh 'echo "Deploying app on EKS Cluster"'
+          dir('k8s-manifests') {
+              withAWS(credentials: 'aws-credentials', region: 'eu-east-1') {
+                      sh "aws eks --region eu-east-1 update-kubeconfig --name eks-cluster-dev"
+                      sh 'kubectl apply -f model-deploy.yaml'
+                      sh 'kubectl apply -f model-svc.yaml'
+                  }
+              }
+        }
+      }
+
   }
 }
