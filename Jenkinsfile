@@ -1,8 +1,8 @@
 pipeline {
   environment {
-    registry = "olehbodunov/pytorch-app"
+    REGISTRY= "olehbodunov"
     registryCredential = 'dockerhub'
-    dockerImage = ''
+    DOCKER_IMAGE_NAME = 'pytorch-app'
   }
   agent any
   stages {
@@ -18,36 +18,21 @@ pipeline {
       }
       stage('Build image'){
         steps {
-          sh './scripts/build.sh pytorch-app'
+          sh './scripts/build.sh ${DOCKER_IMAGE_NAME}'
         }
       }
       stage('Test image'){
         steps {
-          sh './scripts/test.sh pytorch-app'
+          sh './scripts/test.sh ${DOCKER_IMAGE_NAME}'
         }
-      }
-      stage('Rebuild and tag image') {
-          agent {
-            dockerfile {
-                filename 'Dockerfile'
-                dir 'app'
-            }
-          }
-          steps {
-                echo 'Starting to build docker image'
-                script {
-                  dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                }
-
-         }
       }
       stage('Push image') {
         steps{
-          script {
-            docker.withRegistry( '', registryCredential ) {
-              dockerImage.push()
-            }
-          }
+          withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                 sh 'docker login -u ${REGISTRY} -p ${dockerhub}'
+                 sh 'docker tag ${DOCKER_IMAGE_NAME} ${REGISTRY}/${DOCKER_IMAGE_NAME}'
+                 sh 'docker push ${REGISTRY}/${DOCKER_IMAGE_NAME}'
+               }
         }
       }
       stage('Deploy application') {
@@ -60,6 +45,13 @@ pipeline {
                       sh 'kubectl apply -f model-svc.yaml'
                   }
               }
+        }
+      }
+      stage('Cleanup') {
+      steps {
+        sh 'echo "Cleaning up"'
+        sh 'docker system prune'
+        sh 'docker logout'
         }
       }
 
