@@ -31,7 +31,7 @@ pipeline {
           withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
                 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                  sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
-                 sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}'
+                 sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}'
                }
         }
