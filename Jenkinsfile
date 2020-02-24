@@ -1,5 +1,9 @@
 pipeline {
-
+  environment {
+    registry = "olehbodunov/pytorch-app"
+    registryCredential = 'dockerhub'
+    dockerImage = ''
+  }
   agent any
   stages {
       stage('Lint HTML') {
@@ -22,15 +26,29 @@ pipeline {
           sh './scripts/test.sh pytorch-app'
         }
       }
-      stage('Push image to DockerHub') {
+      stage('Push image') {
+          agent {
+            dockerfile {
+                filename 'Dockerfile'
+                dir 'app'
+            }
+          }
           steps {
                 echo 'Starting to build docker image'
                 script {
-                      def customImage = docker.build("pytorch-app:${env.BUILD_ID}")
-                      customImage.push()
+                  dockerImage = docker.build registry + ":$BUILD_NUMBER"
                 }
 
          }
+      }
+      stage('Deploy Image') {
+        steps{
+          script {
+            docker.withRegistry( '', registryCredential ) {
+              dockerImage.push()
+            }
+          }
+        }
       }
   }
 }
