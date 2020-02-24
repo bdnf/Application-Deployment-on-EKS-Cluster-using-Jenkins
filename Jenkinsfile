@@ -2,25 +2,25 @@ pipeline {
 
   agent any
   stages {
-      stage('Initialize'){
-           def dockerHome = tool 'myDocker'
-           env.PATH = "${dockerHome}/bin:${env.PATH}"
-       }
       stage('Lint HTML') {
         steps {
           sh 'pwd && ls && tidy -q -e */*/*.html'
         }
       }
       stage('Lint Dockerfile') {
-              agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    dir 'app'
-                }
-              }
-              steps {
-                sh 'docker run --rm -i hadolint/hadolint < Dockerfile'
-              }
+        steps {
+          sh './scripts/lint.sh'
+        }
+      }
+      stage('Build image'){
+        steps {
+          sh './scripts/build.sh pytorch-app'
+        }
+      }
+      stage('Test image'){
+        steps {
+          sh './scripts/test.sh pytorch-app'
+        }
       }
       stage('Deploying now') {
           agent {
