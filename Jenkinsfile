@@ -22,6 +22,11 @@ pipeline {
           sh './scripts/test.sh pytorch-app'
         }
       }
+      stage('Scan Dockerfile for vulnerabilities') {
+            steps{
+                aquaMicroscanner imageName: "pytorch-app", notCompliesCmd: 'exit 4', onDisallowed: 'fail', outputFormat: 'html'
+            }
+        }
       stage('Deploying now') {
           agent {
             dockerfile {
