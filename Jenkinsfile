@@ -16,12 +16,12 @@ pipeline {
       }
       stage('Build image'){
         steps {
-          sh './scripts/build.sh $IMAGE_NAME'
+          sh './scripts/build.sh ${IMAGE_NAME}'
         }
       }
       stage('Test image'){
         steps {
-          sh './scripts/test.sh $IMAGE_NAME'
+          sh './scripts/test.sh ${IMAGE_NAME}'
         }
       }
       stage('Deploy') {
