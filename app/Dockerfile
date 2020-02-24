@@ -3,7 +3,7 @@ FROM python:3.7.3-stretch
 ## Step 1:
 # Create a working directory
 WORKDIR /app
-ADD requirements.txt /app
+COPY requirements.txt /app
 
 ## Step 2:
 # Install packages from requirements.txt
