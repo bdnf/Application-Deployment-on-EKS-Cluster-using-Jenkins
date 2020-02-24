@@ -1,6 +1,13 @@
+"""
+Model contains set of functions to load pretrained model,
+make prediction with loaded model and
+functions that process input data to a format that model exprects.
+Model - Sentiment Analysis LSTM Model
+
+"""
+
 import os
 import re
-import glob
 import pickle
 
 import torch
@@ -13,9 +20,10 @@ from nltk.stem.porter import *
 from bs4 import BeautifulSoup
 
 
+
 class LSTMClassifier(nn.Module):
     """
-    This is the simple RNN model we will be using to perform Sentiment Analysis.
+    This is the simple RNN model to perform Sentiment Analysis.
     """
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size):
@@ -36,8 +44,8 @@ class LSTMClassifier(nn.Module):
         Perform a forward pass of our model on some input.
         """
         x = x.t()
-        lengths = x[0,:]
-        reviews = x[1:,:]
+        lengths = x[0, :]
+        reviews = x[1:, :]
         embeds = self.embedding(reviews)
         lstm_out, _ = self.lstm(embeds)
         out = self.dense(lstm_out)
@@ -59,7 +67,10 @@ def model_fn(model_dir):
 
     # Determine the device and construct the model.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = LSTMClassifier(model_info['embedding_dim'], model_info['hidden_dim'], model_info['vocab_size'])
+    model = LSTMClassifier(
+        model_info['embedding_dim'],
+        model_info['hidden_dim'],
+        model_info['vocab_size'])
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, 'model.pth')
@@ -98,8 +109,8 @@ def predict_fn(input_data, model):
     test_data_words = review_to_words(input_data)
     data_X, data_len = convert_and_pad(model.word_dict, test_data_words)
 
-    # Using data_X and data_len we construct an appropriate input tensor. Remember
-    # that our model expects input data of the form 'len, review[500]'.
+    # Using data_X and data_len we construct an appropriate input tensor.
+    # Remember that our model expects input data of the form 'len, review[500]'
     data_pack = np.hstack((data_len, data_X))
     data_pack = data_pack.reshape(1, -1)
 
@@ -109,8 +120,9 @@ def predict_fn(input_data, model):
     # Make sure to put the model into evaluation mode
     model.eval()
 
-    # Compute the result of applying the model to the input data. The variable `result` should
-    #       be a numpy array which contains a single integer which is either 1 or 0
+    # Compute the result of applying the model to the input data.
+    # The variable `result` should
+    # be a numpy array which contains a single integer which is either 1 or 0
 
     with torch.no_grad(): predictions = model.forward(data)
 
@@ -121,20 +133,27 @@ def predict_fn(input_data, model):
 
 
 def review_to_words(review):
+    """
+    Filters stopwords and stems the incoming data
+    """
     nltk.download("stopwords", quiet=True)
-    stemmer = PorterStemmer()
 
     text = BeautifulSoup(review, "html.parser").get_text() # Remove HTML tags
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower()) # Convert to lower case
     words = text.split() # Split string into words
-    words = [w for w in words if w not in stopwords.words("english")] # Remove stopwords
+    # Remove stopwords
+    words = [w for w in words if w not in stopwords.words("english")]
     words = [PorterStemmer().stem(w) for w in words] # stem
 
     return words
 
 def convert_and_pad(word_dict, sentence, pad=500):
+    """
+    Pads all words in a sentence to conform to trained values
+    """
     NOWORD = 0 # We will use 0 to represent the 'no word' category
-    INFREQ = 1 # and we use 1 to represent the infrequent words, i.e., words not appearing in word_dict
+    INFREQ = 1 # and we use 1 to represent the infrequent words,
+               # i.e.,  words not appearing in word_dict
 
     working_sentence = [NOWORD] * pad
 

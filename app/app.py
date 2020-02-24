@@ -1,3 +1,7 @@
+"""
+Simple REST API that sends Reviews for
+Sentiment Ananlysis to pretrained Machine Learning Model
+"""
 import logging
 from flask import Flask, request, jsonify, render_template
 from flask.logging import create_logger
