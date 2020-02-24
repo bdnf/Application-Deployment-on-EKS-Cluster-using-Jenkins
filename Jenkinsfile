@@ -49,13 +49,12 @@ pipeline {
               }
         }
       }
-      post {
-        always {
-            sh 'echo "Cleaning up"'
-            sh 'docker system prune'
-            sh 'docker logout'
-          }
-      }
-
-  }
+    }
+    post {
+      always {
+          sh 'echo "Cleaning up"'
+          sh 'docker system prune'
+          sh 'docker logout'
+        }
+    }
 }
