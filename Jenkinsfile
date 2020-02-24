@@ -1,5 +1,3 @@
-def IMAGE_NAME="pytorch-app"
-
 pipeline {
 
   agent any
@@ -16,12 +14,12 @@ pipeline {
       }
       stage('Build image'){
         steps {
-          sh './scripts/build.sh ${IMAGE_NAME}'
+          sh './scripts/build.sh pytorch-app'
         }
       }
       stage('Test image'){
         steps {
-          sh './scripts/test.sh ${IMAGE_NAME}'
+          sh './scripts/test.sh pytorch-app'
         }
       }
       stage('Deploy') {
@@ -34,7 +32,7 @@ pipeline {
           steps {
                 echo 'Starting to build docker image'
                 script {
-                      def customImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
+                      def customImage = docker.build("pytorch-app:${env.BUILD_ID}")
                       customImage.push()
                 }
 
