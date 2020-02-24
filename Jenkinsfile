@@ -4,9 +4,7 @@ pipeline {
     registryCredential = 'dockerhub'
     dockerImage = ''
   }
-  agent {
-    label 'docker' 
-  }
+  agent any
   stages {
       stage('Lint HTML') {
         steps {
