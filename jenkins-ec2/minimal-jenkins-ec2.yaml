@@ -29,25 +29,25 @@ Parameters:
 Mappings:
   AWSRegionArch2AMI:
     eu-central-1:
-      AMI: ami-0df0e7600ad0913a9
+      AMI: ami-0b418580298265d5c
     eu-west-1:
-      AMI: ami-099a8245f5daa82bf
+      AMI: ami-035966e8adab4aaad
     eu-west-2:
-      AMI: ami-0389b2a3c4948b1a0
+      AMI: ami-006a0174c6c25ac06
     eu-west-3:
-      AMI: ami-0fd9bce3a3384b635
+      AMI: ami-096b8af6e7e8fb927
     eu-north-1:
-      AMI: ami-074a0e4318181e9d9
+      AMI: ami-0b7937aeb16a7eb94
     sa-east-1:
       AMI: ami-0ad7b0031d41ed4b9
     us-east-1:
-      AMI: ami-0a887e401f7654935
+      AMI: ami-07ebfd5b3428b6f4d
     us-east-2:
-      AMI: ami-0e38b48473ea57778
+      AMI: ami-0fc20dd1da406780b
     us-west-1:
-      AMI: ami-01c94064639c71719
+      AMI: ami-03ba3948f6c37a4b0
     us-west-2:
-      AMI: ami-0e8c04af2729ff1bb
+      AMI: ami-0d1cd67c26f5fca19
 
 Resources:
   JenkinsServer:
@@ -65,23 +65,45 @@ Resources:
       Tags:
        - Key: Name
          Value: Jenkins Server
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sdk"
+          Ebs:
+            VolumeSize: "10"
+            DeleteOnTermination: true
+            VolumeType: "gp2"
       UserData:
         Fn::Base64: |
            #!/bin/bash
-           sudo yum -y update
-           sudo yum -y install java-1.8.0
-           sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
-           sudo rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
-           sudo yum -y install jenkins git
+           sudo apt update
+           sudo apt install default-jdk wget -y
+           wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+           sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+           sudo apt update
+           # install Jenkins
+           sudo apt install jenkins -y
            sudo systemctl status jenkins
            sudo systemctl enable jenkins.service
            sudo systemctl start jenkins.service
            sleep 10
-           sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /home/ec2-user/jenkins-first-access.txt
-           rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-           rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-           # sudo yum install libtidy libtidy-devel
-           sudo yum install -y tidy
+           sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /home/ubuntu/jenkins-first-access.txt
+           sudo apt install tidy -y
+           # install Docker
+           sudo apt update
+           sudo apt install \
+                apt-transport-https \
+                ca-certificates \
+                curl \
+                gnupg-agent \
+                software-properties-common -y
+           sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+           sudo apt-key fingerprint 0EBFCD88
+           sudo add-apt-repository \
+               "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+               $(lsb_release -cs) \
+               stable"
+           sudo apt update
+           sudo apt install docker-ce docker-ce-cli containerd.io -y
+           sudo usermod -a -G docker $USER
 
 
   ServerSecurityGroup:
