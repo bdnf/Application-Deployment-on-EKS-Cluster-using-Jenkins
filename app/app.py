@@ -1,10 +1,6 @@
+import logging
 from flask import Flask, request, jsonify, render_template
 from flask.logging import create_logger
-import logging
-
-import pandas as pd
-from sklearn.externals import joblib
-from sklearn.preprocessing import StandardScaler
 
 from predict import model_fn, predict_fn
 
@@ -12,21 +8,16 @@ app = Flask(__name__)
 LOG = create_logger(app)
 LOG.setLevel(logging.INFO)
 
-def scale(payload):
-    """Scales Payload"""
-
-    LOG.info("Scaling Payload: \n %s" , payload)
-    scaler = StandardScaler().fit(payload.astype(float))
-    scaled_adhoc_predict = scaler.transform(payload.astype(float))
-    return scaled_adhoc_predict
 
 @app.route("/")
 def home():
+    """ Generates homepage"""
     return render_template('index.html')
 
 @app.route("/predict", methods=['POST'])
 def predict():
-    LOG.info("==========")
+    """ Call Predict function on a loaded LSTM model"""
+
     if request.method == "POST":
         LOG.info("I am a post")
         if request.form:
@@ -43,11 +34,11 @@ def predict():
             LOG.info("fail")
 
     data = request.data
-    LOG.info("Form data is: \n %s", data.decode('utf-8'))
+    LOG.info("Form data is: \n %s" % data.decode('utf-8'))
 
     # get an output prediction from the pretrained model, model
-    result = predict_fn(data.decode('utf-8'),model)
-    LOG.info("Prediction value is: %s", result)
+    result = predict_fn(data.decode('utf-8'), model)
+    LOG.info("Prediction value is: %s" % result)
     return str(result)
 
 

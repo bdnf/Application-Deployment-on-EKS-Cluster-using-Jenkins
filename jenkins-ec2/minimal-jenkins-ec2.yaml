@@ -72,12 +72,16 @@ Resources:
            sudo yum -y install java-1.8.0
            sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
            sudo rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
-           sudo yum -y install jenkins
+           sudo yum -y install jenkins git
            sudo systemctl status jenkins
            sudo systemctl enable jenkins.service
            sudo systemctl start jenkins.service
-           sleep 15
-           sudo cat /var/lib/jenkins/secrets/initialAdminPassword > jenkins-first-access.txt
+           sleep 10
+           sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /home/ec2-user/jenkins-first-access.txt
+           rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+           rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+           # sudo yum install libtidy libtidy-devel
+           sudo yum install -y tidy
 
 
   ServerSecurityGroup:

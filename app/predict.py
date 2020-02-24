@@ -1,17 +1,17 @@
+import os
+import re
+import glob
+import pickle
+
+import torch
 import torch.nn as nn
+import numpy as np
+
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
-
-import re
 from bs4 import BeautifulSoup
 
-import pickle
-
-import os
-import glob
-import numpy as np
-import torch
 
 class LSTMClassifier(nn.Module):
     """
@@ -77,6 +77,12 @@ def model_fn(model_dir):
     return model
 
 def predict_fn(input_data, model):
+    """
+    Takes input data, prepares it into format suitable for prediction
+    and passed it next to model
+
+    Returns prediction of type float. Example: 0.9534
+    """
     print('Inferring sentiment of input data.')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
