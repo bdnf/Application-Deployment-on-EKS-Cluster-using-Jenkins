@@ -1,9 +1,9 @@
 pipeline {
   environment {
-    REGISTRY= "olehbodunov"
     registryCredential = 'dockerhub'
     DOCKER_IMAGE_NAME = 'pytorch-app'
     TAG_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+    CLUSTER_NAME='eks-cluster-dev'
   }
   agent any
   stages {
@@ -42,19 +42,19 @@ pipeline {
           sh 'echo "Deploying app on EKS Cluster"'
           dir('k8s-manifests') {
               withAWS(credentials: 'aws-credentials', region: 'eu-east-1') {
-                      sh "aws eks --region eu-east-1 update-kubeconfig --name eks-cluster-dev"
+                      sh "aws eks --region eu-east-1 update-kubeconfig --name ${CLUSTER_NAME}"
                       sh 'kubectl apply -f model-deploy.yaml'
                       sh 'kubectl apply -f model-svc.yaml'
                   }
               }
         }
       }
-      stage('Cleanup') {
-      steps {
-        sh 'echo "Cleaning up"'
-        sh 'docker system prune'
-        sh 'docker logout'
-        }
+      post {
+        always {
+            sh 'echo "Cleaning up"'
+            sh 'docker system prune'
+            sh 'docker logout'
+          }
       }
 
   }

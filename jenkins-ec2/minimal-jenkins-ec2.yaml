@@ -108,6 +108,9 @@ Resources:
            # enable docker to store everything on EBS volume
            sudo mkfs -t ext4 /dev/xvdk
            sudo mount /dev/xvdf /var/lib/docker
+           # awscli required to push to EKS
+           sudo apt install python3-pip
+           pip3 install awscli --upgrade --user
 
 
   ServerSecurityGroup:
