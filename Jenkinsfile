@@ -1,3 +1,5 @@
+def IMAGE_NAME="pytorch-app"
+
 pipeline {
 
   agent any
@@ -14,17 +16,17 @@ pipeline {
       }
       stage('Build image'){
         steps {
-          sh './scripts/build.sh pytorch-app'
+          sh './scripts/build.sh $IMAGE_NAME'
         }
       }
       stage('Test image'){
         steps {
-          sh './scripts/test.sh pytorch-app'
+          sh './scripts/test.sh $IMAGE_NAME'
         }
       }
       stage('Scan Dockerfile for vulnerabilities') {
             steps{
-                aquaMicroscanner imageName: "pytorch-app", notCompliesCmd: 'exit 4', onDisallowed: 'fail', outputFormat: 'html'
+                aquaMicroscanner imageName: IMAGE_NAME, notCompliesCmd: 'exit 1', onDisallowed: 'fail'
             }
         }
       stage('Deploying now') {
