@@ -33,7 +33,7 @@ pipeline {
                 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                  sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
-                 sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}'
+                 sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                }
         }
       }
