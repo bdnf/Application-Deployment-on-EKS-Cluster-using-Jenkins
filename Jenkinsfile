@@ -3,6 +3,7 @@ pipeline {
     REGISTRY= "olehbodunov"
     registryCredential = 'dockerhub'
     DOCKER_IMAGE_NAME = 'pytorch-app'
+    TAG_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
   }
   agent any
   stages {
@@ -31,7 +32,7 @@ pipeline {
           withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
                 usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                  sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
-                 sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}'
+                 sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}'
                }
         }
