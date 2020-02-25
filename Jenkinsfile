@@ -41,7 +41,7 @@ pipeline {
         steps {
           sh 'echo "Deploying app on EKS Cluster"'
           dir('k8s-manifests') {
-              withAWS(credentials: 'aws-credentials', region: 'eu-east-1') {
+              withAWS(credentials: 'aws-credentials', region: 'us-east-1') {
                       sh "aws eks update-kubeconfig --name ${CLUSTER_NAME}"
                       sh 'kubectl apply -f model-deploy.yaml'
                       sh 'kubectl apply -f model-svc.yaml'
