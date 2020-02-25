@@ -20,7 +20,7 @@ spec:
         app: model-ml
     spec:
       containers:
-        image: olehbodunov/ml-model-predictor
+      - image: olehbodunov/ml-model-predictor
         imagePullPolicy: Always
         name: model-ml
         ports:

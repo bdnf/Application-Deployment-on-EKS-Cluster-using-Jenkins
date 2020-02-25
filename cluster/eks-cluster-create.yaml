@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: eks-simple-cluster
+  name: eks-cluster-dev
   region: us-east-1
 #
 #
@@ -24,6 +24,7 @@ metadata:
 #         id: "subnet-064766f3a11487c91"
 #         cidr: "192.168.192.0/18"  # (optional, must match CIDR used by the given subnet)
 
+availabilityZones: ["us-east-1a", "us-east-1b", "us-east-1c"]
 
 nodeGroups:
   - name: ng-1
