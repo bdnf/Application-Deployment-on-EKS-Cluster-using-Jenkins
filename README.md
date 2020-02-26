@@ -85,7 +85,7 @@ Navigate to your Jenkins server and create Pipeline pointing to repository with 
 This will trigger deployment of an application in EKS Cluster using Rolling Deployment update strategy.
 
 Example output of the Pipeline:
-![Success](./assets/pipeline.png)
+![Success](./screenshots/pipeline.png)
 
 
 # Example Python ML application
@@ -95,11 +95,11 @@ Example application provided is a simple Flask web server hosting pre-trained Se
 You can type any review and instantly get feedback if it was Positive, Negative or Neutral with exact precision.
 
 Simple web interface will look like the following:
-![WebApp](./assets/review-ui.png)
+![WebApp](./screenshots/sentiment-ui.png)
 
 You can learn more on how the application has been created, following steps in my other repository:
 https://github.com/bdnf/SageMaker-RNN-with-API-Gateway
 
 Necessary source files and Dockerfile for an application you can find in `./app` folder.
 
-`k8s-manifests` folder contains necessary Kubernetes manifest files. 
+`k8s-manifests` folder contains necessary Kubernetes manifest files.
