@@ -4,6 +4,8 @@ pipeline {
     DOCKER_IMAGE_NAME = 'pytorch-app'
     TAG_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     CLUSTER_NAME='eks-cluster-dev'
+    DEPLOYMENT_NAME="model-ml"
+    UPDATED_IMAGE_NAME="will be updated"
   }
   agent any
   stages {
@@ -34,6 +36,7 @@ pipeline {
                  sh 'docker login -u ${USERNAME} -p ${PASSWORD}'
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
+                 UPDATED_IMAGE_NAME = '${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                }
         }
       }
@@ -45,6 +48,8 @@ pipeline {
                       sh "aws eks update-kubeconfig --name ${CLUSTER_NAME}"
                       sh 'kubectl apply -f model-deploy.yaml'
                       sh 'kubectl apply -f model-svc.yaml'
+                      sh 'Updating image of Deployment'
+                      sh 'kubectl set image deployments/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${UPDATED_IMAGE_NAME}'
                   }
               }
         }

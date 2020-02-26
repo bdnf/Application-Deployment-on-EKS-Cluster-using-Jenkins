@@ -66,9 +66,9 @@ Resources:
        - Key: Name
          Value: Jenkins Server
       BlockDeviceMappings:
-        - DeviceName: "/dev/sdk"
+        - DeviceName: "/dev/xvdk"
           Ebs:
-            VolumeSize: "30"
+            VolumeSize: "50"
             DeleteOnTermination: true
             VolumeType: "gp2"
       UserData:
@@ -107,10 +107,19 @@ Resources:
            sudo usermod -a -G docker jenkins
            # enable docker to store everything on EBS volume
            sudo mkfs -t ext4 /dev/xvdk
-           sudo mount /dev/xvdf /var/lib/docker
+           sudo mount /dev/xvdk /var/lib/docker
            # awscli required to push to EKS
            sudo apt install python3-pip
            pip3 install awscli --upgrade --user
+           # Install kubectl
+           sudo bash -c 'apt-get update && apt-get install -y apt-transport-https
+           curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+           cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+           deb http://apt.kubernetes.io/ kubernetes-xenial main
+           EOF
+           apt-get update'
+           sudo apt install -y kubectl
+           sudo apt-mark hold kubelet kubeadm kubectl
 
 
   ServerSecurityGroup:

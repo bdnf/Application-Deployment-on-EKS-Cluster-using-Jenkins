@@ -13,9 +13,7 @@ Parameters:
       - 1.13
       - 1.14
 
-  ClusterRole:
-    Description: The IAM Role to allow Amazon EKS and the Kubernetes control plane to manage AWS resources on your behalf.
-    Type: String
+
 
   KeyName:
     Description: The EC2 Key Pair to allow SSH access to the instances
@@ -186,6 +184,57 @@ Metadata:
 
 Resources:
 
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Sub ${ClusterName}
+      Version: !Sub ${KubernetesVersion}
+      RoleArn: !Sub ${ClusterRole}
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - !Ref ClusterControlPlaneSecurityGroup
+        SubnetIds: !Ref Subnets
+      RoleArn: !GetAtt EKSClusterInstanceRole.Arn
+
+  EKSClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group EKS Cluster
+      VpcId:
+        !Ref VpcId
+      Tags:
+      - Key: !Sub "kubernetes.io/cluster/${AWS::StackName}-EKS-Cluster"
+        Value: 'owned'
+      - Key: 'Name'
+        Value: !Join [ "", [ !Ref 'AWS::StackName', "-EKS-Cluster-Security-Group" ] ]
+
+  EKSClusterInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref EKSClusterInstanceRole
+
+  EKSClusterInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - eks.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      RoleName: !Join [ "-", [ !Ref 'AWS::StackName', "EKS-Cluster-Role" ] ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+
+
   NodeInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -215,6 +264,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for all nodes in the cluster
+      GroupName: 'NodeSecurityGroup'
       VpcId:
         !Ref VpcId
       Tags:
@@ -287,6 +337,17 @@ Resources:
       ToPort: 443
       FromPort: 443
 
+  KubeClusterControlPlaneSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: NodeSecurityGroup
+    Properties:
+      Description: Allow pods to communicate with the cluster API Server
+      GroupId: !Ref NodeSecurityGroup
+      SourceSecurityGroupId: !Ref NodeSecurityGroup
+      IpProtocol: -1
+      ToPort: 0
+      FromPort: 65535
+
   NodeGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -311,7 +372,7 @@ Resources:
   NodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      AssociatePublicIpAddress: 'true'
+      AssociatePublicIpAddress: 'false'
       IamInstanceProfile: !Ref NodeInstanceProfile
       ImageId: !Ref NodeImageId
       InstanceType: !Ref NodeInstanceType
@@ -344,8 +405,8 @@ Outputs:
     Value: !Ref NodeSecurityGroup
   ClusterCertificate:
     Description: The cluster certificate
-    Value: !GetAtt Cluster.CertificateAuthorityData
+    Value: !GetAtt EKSCluster.CertificateAuthorityData
 
   ClusterEndpoint:
     Description: The cluster endpoint
-    Value: !GetAtt Cluster.Endpoint
+    Value: !GetAtt EKSCluster.Endpoint
