@@ -49,7 +49,9 @@ pipeline {
                       sh 'kubectl apply -f model-deploy.yaml'
                       sh 'kubectl apply -f model-svc.yaml'
                       sh 'Updating image of Deployment'
-                      sh 'kubectl set image deployments/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${UPDATED_IMAGE_NAME}'
+                      script {
+                        sh 'kubectl set image deployments/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${UPDATED_IMAGE_NAME}'
+                      }
                   }
               }
         }
