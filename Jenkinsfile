@@ -37,8 +37,9 @@ pipeline {
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  script {
-                    UPDATED_IMAGE_NAME = '${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
+                    env.UPDATED_IMAGE_NAME = '${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  }
+                 sh 'echo Updated image name is: ${UPDATED_IMAGE_NAME}'
                }
         }
       }
@@ -51,7 +52,9 @@ pipeline {
                       sh 'kubectl apply -f model-deploy.yaml'
                       sh 'kubectl apply -f model-svc.yaml'
                       sh 'echo "Updating for newer image version"'
-                      sh 'kubectl set image deployments/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${UPDATED_IMAGE_NAME}'
+                      script {
+                        sh 'kubectl set image deployments/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=${UPDATED_IMAGE_NAME}'
+                      }
                   }
               }
         }
