@@ -5,7 +5,7 @@ pipeline {
     TAG_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     CLUSTER_NAME='eks-cluster-dev'
     DEPLOYMENT_NAME="model-ml"
-    UPDATED_IMAGE_NAME="will be updated"
+    UPDATED_IMAGE_NAME = ''
   }
   agent any
   stages {
