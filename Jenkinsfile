@@ -37,7 +37,7 @@ pipeline {
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  script {
-                    UPDATED_IMAGE_NAME = "${USERNAME}/${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}"
+                    UPDATED_IMAGE_NAME = "${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}"
                  }
                  sh "echo Updated image name is: ${UPDATED_IMAGE_NAME}"
                }
