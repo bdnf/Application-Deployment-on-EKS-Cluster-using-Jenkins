@@ -5,7 +5,7 @@ pipeline {
     TAG_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     CLUSTER_NAME='eks-cluster-dev'
     DEPLOYMENT_NAME="model-ml"
-    UPDATED_IMAGE_NAME = '${BUILD_NUMBER}'
+    UPDATED_IMAGE_NAME = 'echo ${BUILD_NUMBER}'
   }
   agent any
   stages {
@@ -37,7 +37,7 @@ pipeline {
                  sh 'docker tag ${DOCKER_IMAGE_NAME} ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  sh 'docker push ${USERNAME}/${DOCKER_IMAGE_NAME}:${TAG_COMMIT}'
                  script {
-                    env.UPDATED_IMAGE_NAME = '${USERNAME}/${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}'
+                    UPDATED_IMAGE_NAME = '${USERNAME}/${DOCKER_IMAGE_NAME}:${echo ${BUILD_NUMBER}}'
                  }
                  sh 'echo Updated image name is: ${UPDATED_IMAGE_NAME}'
                }
