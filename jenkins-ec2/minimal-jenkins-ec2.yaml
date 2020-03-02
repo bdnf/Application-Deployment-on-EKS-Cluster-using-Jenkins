@@ -103,23 +103,22 @@ Resources:
                stable"
            sudo apt update
            sudo apt install docker-ce docker-ce-cli containerd.io -y
-           sudo usermod -a -G docker $USER
+           #sudo usermod -a -G docker $USER
            sudo usermod -a -G docker jenkins
-           # enable docker to store everything on EBS volume
-           sudo mkfs -t ext4 /dev/xvdk
-           sudo mount /dev/xvdk /
+
            # awscli required to push to EKS
-           sudo apt install python3-pip
+           sudo apt install python3-pip -y
            pip3 install awscli --upgrade --user
            # Install kubectl
-           sudo bash -c 'apt-get update && apt-get install -y apt-transport-https
-           curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-           cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-           deb http://apt.kubernetes.io/ kubernetes-xenial main
-           EOF
-           apt-get update'
-           sudo apt install -y kubectl
-           sudo apt-mark hold kubelet kubeadm kubectl
+           sudo apt-get update && sudo apt-get install -y apt-transport-https
+           curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+           echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+           sudo apt-get update
+           sudo apt-get install -y kubectl
+           # enable docker to store everything on EBS volume
+           # lsblk
+           sudo mkfs -t ext4 /dev/xvdk
+           sudo mount /dev/xvdk /var/lib/docker
 
 
   ServerSecurityGroup:

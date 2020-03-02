@@ -87,9 +87,15 @@ This will trigger deployment of an application in EKS Cluster using Rolling Depl
 Example output of the Pipeline:
 ![Success](./screenshots/pipeline.png)
 
-Status of deployment can be checked with `kubectl rollout status deployments/model-ml`
+Status of deployment can be checked with:
+```
+kubectl rollout status deployments/model-ml
+```
+And this should return:
+```
+deployment "model-ml" successfully rolled out
+```
 
-![Rollout](./screenshots/rollout-status.png)
 
 
 # Example Python ML application
